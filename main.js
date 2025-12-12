@@ -3,11 +3,11 @@ const out = document.getElementById("strengthValue");
 
 let count = 0;
 
-function show(msg){
+function show(msg) {
   out.textContent = msg;
 }
 
-function onMotion(e){
+function onMotion(e) {
   count++;
   const a = e.accelerationIncludingGravity;
   const r = e.rotationRate;
@@ -25,27 +25,32 @@ function onMotion(e){
   );
 }
 
-async function enable(){
-  try{
+async function enable() {
+  try {
+    if (!window.matchMedia("(orientation: landscape)").matches) {
+      alert("請先把手機轉成橫向再開始互動");
+      return;
+    }
+
     // iOS 可能需要 motion + orientation 都請求（保險做法）
-    if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function"){
+    if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
       const p = await DeviceMotionEvent.requestPermission();
       alert("DeviceMotion permission = " + p);
       if (p !== "granted") return;
     }
 
-    window.addEventListener("devicemotion", onMotion, { passive:true });
+    window.addEventListener("devicemotion", onMotion, { passive: true });
     btn.textContent = "已啟用";
     btn.disabled = true;
 
     // 1 秒後看有沒有事件
     setTimeout(() => {
-      if (count === 0){
+      if (count === 0) {
         alert("目前沒有收到 devicemotion 事件（通常是 Safari/權限/安全環境問題）");
       }
     }, 1000);
 
-  }catch(err){
+  } catch (err) {
     alert("啟用失敗：" + err.message);
   }
 }
