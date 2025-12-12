@@ -1,0 +1,61 @@
+body{
+  margin:0;
+  height:100vh;
+  display:grid;
+  place-items:center;
+  background:#0b0f14;
+  color:#e9eef7;
+  font-family: system-ui, -apple-system, "PingFang TC";
+}
+
+#pad{
+  width:min(70vmin, 360px);
+  aspect-ratio:1/1;
+  border-radius:24px;
+  background: radial-gradient(circle at 30% 30%, #2a2f3a, #141a23);
+  border:1px solid rgba(255,255,255,.12);
+  display:grid;
+  place-items:center;
+  position:relative;
+  overflow:hidden;
+}
+
+#dot{
+  width:120px;
+  height:120px;
+  border-radius:999px;
+  background: rgba(90,160,255,.25);
+  border:2px solid rgba(90,160,255,.55);
+  transition: all 60ms linear;
+}
+
+#ring{
+  position:absolute;
+  inset:0;
+  border-radius:24px;
+  pointer-events:none;
+  transition: box-shadow 120ms ease-out;
+}
+
+#ui{
+  position:fixed;
+  left:16px;
+  right:16px;
+  bottom:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:14px;
+}
+
+button{
+  padding:10px 14px;
+  border-radius:12px;
+  background:#1d2736;
+  color:#e9eef7;
+  border:1px solid rgba(255,255,255,.14);
+}
+
+.mono{
+  font-family: ui-monospace, Menlo, monospace;
+}
