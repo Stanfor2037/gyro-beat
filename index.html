@@ -2,29 +2,31 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gyro Beat</title>
-
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="./style.css" />
 </head>
-
-<div id="rotateHint">
-  請把手機轉成橫向
-</div>
-
 <body>
-  <div id="pad">
-    <div id="dot"></div>
-    <div id="ring"></div>
-  </div>
-
-  <div id="ui">
+  <header class="topbar">
     <button id="enableBtn">啟用感測器</button>
-    <div class="mono">
-      strength: <span id="strengthValue">0.00</span>
+    <div class="hud">
+      <div>Strength: <span id="strengthValue">0.00</span></div>
+      <div>Score: <span id="scoreValue">0</span></div>
+      <div>Status: <span id="statusValue">ready</span></div>
     </div>
-  </div>
+  </header>
 
-  <script src="main.js"></script>
+  <main id="stage">
+    <!-- 粒子層 -->
+    <canvas id="fx"></canvas>
+
+    <!-- 主圓 -->
+    <div id="circle"></div>
+
+    <!-- 結果文字（Perfect/Good/Miss） -->
+    <div id="resultText" class="result hidden">Perfect</div>
+  </main>
+
+  <script src="./main.js"></script>
 </body>
 </html>
