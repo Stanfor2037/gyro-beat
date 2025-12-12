@@ -358,7 +358,7 @@ loop();
 // 啟用按鈕：感測器＋音效初始化
 // =====================
 async function enable() {
-  try {
+  try {  
     // 音效需要 user gesture 先初始化
     ensureAudio();
 
@@ -369,6 +369,9 @@ async function enable() {
       alert("DeviceMotion permission = " + p);
       if (p !== "granted") return;
     }
+
+    alert("vibrate exists? " + ("vibrate" in navigator));
+    alert("vibrate call result: " + (navigator.vibrate ? navigator.vibrate(50) : "no api"));
 
     window.addEventListener("devicemotion", onMotion, { passive: true });
 
