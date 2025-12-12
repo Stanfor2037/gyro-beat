@@ -1,3 +1,34 @@
+/* 橫向時：把內容做得更像遊戲 HUD */
+@media (orientation: landscape) {
+  body{
+    place-items: center;
+  }
+
+  #pad{
+    width: min(55vmin, 380px); /* 橫向時別太大，留空間給 UI */
+  }
+
+  #ui{
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  button{
+    font-size: 16px;
+    padding: 12px 16px;
+  }
+
+  .mono{
+    font-size: 16px;
+  }
+}
+
+
+
+
 body{
   margin:0;
   height:100vh;
