@@ -30,7 +30,7 @@ window.addEventListener("orientationchange", () => {
 });
 
 // 直/橫軸向重映射（讓手感一致）
-function getGameAxes(a){
+function getGameAxes(a) {
   const x = a.x ?? 0;
   const y = a.y ?? 0;
   const z = a.z ?? 0;
@@ -38,43 +38,43 @@ function getGameAxes(a){
   const isLandscape = window.matchMedia("(orientation: landscape)").matches;
   const o = typeof window.orientation === "number" ? window.orientation : 0;
 
-  if(!isLandscape){
+  if (!isLandscape) {
     return { gx: x, gy: y, gz: z };
   }
-  if(o === 90){
+  if (o === 90) {
     return { gx: y, gy: -x, gz: z };
   }
-  if(o === -90){
+  if (o === -90) {
     return { gx: -y, gy: x, gz: z };
   }
   return { gx: x, gy: y, gz: z };
 }
 
 let lastHitTime = 0;
-function onMotion(e){
+function onMotion(e) {
   if (performance.now() < ignoreUntil) return;
 
   const a = e.accelerationIncludingGravity;
-  if(!a) return;
+  if (!a) return;
 
   const g = getGameAxes(a);
   const ax = g.gx, ay = g.gy, az = g.gz;
 
   const t = e.timeStamp; // ms
-  if(!lastAccel || !lastTime){
-    lastAccel = {x:ax, y:ay, z:az};
+  if (!lastAccel || !lastTime) {
+    lastAccel = { x: ax, y: ay, z: az };
     lastTime = t;
     return;
   }
 
   const dt = (t - lastTime) / 1000;
-  if(dt <= 0) return;
+  if (dt <= 0) return;
 
   const dax = ax - lastAccel.x;
   const day = ay - lastAccel.y;
   const daz = az - lastAccel.z;
 
-  const jerk = Math.sqrt(dax*dax + day*day + daz*daz) / dt;
+  const jerk = Math.sqrt(dax * dax + day * day + daz * daz) / dt;
   filteredJerk = filteredJerk * SMOOTH + jerk * (1 - SMOOTH);
 
   const strength = (filteredJerk < DEAD_ZONE) ? 0 : filteredJerk;
@@ -82,12 +82,12 @@ function onMotion(e){
 
   // 嘗試擊中（節奏窗判定在 hitAttempt 裡）
   const now = performance.now();
-  if(strength > HIT_THRESHOLD && (now - lastHitTime) > COOLDOWN_MS){
+  if (strength > HIT_THRESHOLD && (now - lastHitTime) > COOLDOWN_MS) {
     lastHitTime = now;
     hitAttempt();
   }
 
-  lastAccel = {x:ax, y:ay, z:az};
+  lastAccel = { x: ax, y: ay, z: az };
   lastTime = t;
 }
 
@@ -103,16 +103,16 @@ let state = "charging"; // charging | hit | fail
 let chargeStart = performance.now();
 let score = 0;
 
-function progress01(){
+function progress01() {
   const t = (performance.now() - chargeStart) / CHARGE_DURATION;
   return Math.min(Math.max(t, 0), 1);
 }
 
-function setStatus(s){
+function setStatus(s) {
   outStatus.textContent = s;
 }
 
-function showResult(text){
+function showResult(text) {
   resultText.textContent = text;
   resultText.classList.remove("hidden");
   clearTimeout(showResult._t);
@@ -123,7 +123,7 @@ function showResult(text){
 // 3) 粒子：Canvas 四散
 // =====================
 let particles = [];
-function resize(){
+function resize() {
   const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
   canvas.width = Math.floor(window.innerWidth * dpr);
   canvas.height = Math.floor(window.innerHeight * dpr);
@@ -134,59 +134,58 @@ function resize(){
 window.addEventListener("resize", resize);
 resize();
 
-function circleCenter(){
+function circleCenter() {
   const rect = circle.getBoundingClientRect();
-  return { x: rect.left + rect.width/2, y: rect.top + rect.height/2 };
+  return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
 }
 
-function spawnParticles(kind){
-  const {x, y} = circleCenter();
+function spawnParticles(kind) {
+  const { x, y } = circleCenter();
   const n = (kind === "hit") ? 60 : 80;
 
-  for(let i=0;i<n;i++){
+  for (let i = 0; i < n; i++) {
     const ang = Math.random() * Math.PI * 2;
-    const spd = (kind === "hit" ? 260 : 320) * (0.6 + Math.random()*0.8);
+    const spd = (kind === "hit" ? 140 : 200) * (0.6 + Math.random() * 0.8);
     particles.push({
       x, y,
       vx: Math.cos(ang) * spd,
       vy: Math.sin(ang) * spd,
-      life: 520 + Math.random()*240,
+      life: 1200 + Math.random() * 800,
       age: 0,
-      r: 2 + Math.random()*3,
+      r: 5 + Math.random() * 8,
       kind
     });
   }
 }
 
-function updateParticles(dt){
+function updateParticles(dt) {
   particles = particles.filter(p => (p.age += dt) < p.life);
-  for(const p of particles){
-    p.x += p.vx * dt/1000;
-    p.y += p.vy * dt/1000;
+  for (const p of particles) {
+    p.x += p.vx * dt / 1000;
+    p.y += p.vy * dt / 1000;
     // 空氣阻力
-    p.vx *= 0.985;
-    p.vy *= 0.985;
-    // 些微重力（失敗更重一點）
-    p.vy += (p.kind === "fail" ? 420 : 220) * dt/1000;
+    p.vx *= 0.992;
+    p.vy *= 0.992;
+    p.vy += (p.kind === "fail" ? 220 : 120) * dt / 1000;
   }
 }
 
-function drawParticles(){
-  ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+function drawParticles() {
+  ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-  for(const p of particles){
-    const t = 1 - (p.age / p.life); // 1 → 0
-    ctx.globalAlpha = Math.max(0, t);
+  for (const p of particles) {
+    const t = 1 - (p.age / p.life);
+    ctx.globalAlpha = Math.pow(Math.max(0, t), 0.6);
 
     // hit：黃光；fail：偏紅橘
-    if(p.kind === "hit"){
+    if (p.kind === "hit") {
       ctx.fillStyle = "rgba(255, 230, 80, 1)";
-    }else{
+    } else {
       ctx.fillStyle = "rgba(255, 90, 60, 1)";
     }
 
     ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
     ctx.fill();
   }
 
@@ -198,17 +197,17 @@ function drawParticles(){
 // =====================
 // WebAudio：用最短路徑做「點一下」聲（不需要音檔）
 let audioCtx = null;
-function ensureAudio(){
-  if(!audioCtx){
+function ensureAudio() {
+  if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
-  if(audioCtx.state === "suspended"){
+  if (audioCtx.state === "suspended") {
     audioCtx.resume();
   }
 }
 
-function playClick(type){
-  if(!audioCtx) return;
+function playClick(type) {
+  if (!audioCtx) return;
 
   const t0 = audioCtx.currentTime;
 
@@ -231,8 +230,8 @@ function playClick(type){
   osc.stop(t0 + 0.14);
 }
 
-function vibrate(pattern){
-  if(navigator.vibrate){
+function vibrate(pattern) {
+  if (navigator.vibrate) {
     navigator.vibrate(pattern);
   }
 }
@@ -240,24 +239,24 @@ function vibrate(pattern){
 // =====================
 // 命中/失敗邏輯
 // =====================
-function hitAttempt(){
-  if(state !== "charging") return;
+function hitAttempt() {
+  if (state !== "charging") return;
 
   const p = progress01();       // 0~1
   const remain = 1 - p;         // 越接近 0 越接近紅點
 
   // 節奏窗：只允許最後一段時間擊中
-  if(remain <= PERFECT_WINDOW){
+  if (remain <= PERFECT_WINDOW) {
     doHit("Perfect", 3);
-  }else if(remain <= GOOD_WINDOW){
+  } else if (remain <= GOOD_WINDOW) {
     doHit("Good", 1);
-  }else{
+  } else {
     // 太早打：算 Miss（也可以選擇什麼都不發生）
     doMiss("Too Early");
   }
 }
 
-function doHit(label, add){
+function doHit(label, add) {
   state = "hit";
   score += add;
   outScore.textContent = String(score);
@@ -274,7 +273,7 @@ function doHit(label, add){
 
   // 音效＋震動
   playClick("hit");
-  vibrate([30, 30, 30]);
+  vibrate([50, 80, 50]);
 
   setTimeout(() => {
     circle.classList.remove("hitPop");
@@ -282,7 +281,7 @@ function doHit(label, add){
   }, 260);
 }
 
-function doMiss(reason){
+function doMiss(reason) {
   setStatus("miss");
   showResult("Miss");
   // 你也可以選擇：miss 不重置、只是提示
@@ -291,7 +290,7 @@ function doMiss(reason){
   vibrate(20);
 }
 
-function failTimeout(){
+function failTimeout() {
   // 到紅點還沒 hit → fail
   state = "fail";
   setStatus("fail");
@@ -312,7 +311,7 @@ function failTimeout(){
   }, 420);
 }
 
-function resetCycle(){
+function resetCycle() {
   state = "charging";
   chargeStart = performance.now();
   setStatus("charging");
@@ -323,8 +322,8 @@ function resetCycle(){
 // =====================
 // 充能顏色（綠→紅）＋失敗判定
 // =====================
-function updateCharging(){
-  if(state !== "charging") return;
+function updateCharging() {
+  if (state !== "charging") return;
 
   const p = progress01(); // 0~1
 
@@ -333,7 +332,7 @@ function updateCharging(){
   circle.style.background = `hsl(${hue}, 80%, 50%)`;
 
   // 到頭了就 fail
-  if(p >= 1){
+  if (p >= 1) {
     failTimeout();
   }
 }
@@ -342,7 +341,7 @@ function updateCharging(){
 // 主迴圈
 // =====================
 let lastFrame = performance.now();
-function loop(){
+function loop() {
   const now = performance.now();
   const dt = now - lastFrame;
   lastFrame = now;
@@ -358,26 +357,26 @@ loop();
 // =====================
 // 啟用按鈕：感測器＋音效初始化
 // =====================
-async function enable(){
-  try{
+async function enable() {
+  try {
     // 音效需要 user gesture 先初始化
     ensureAudio();
 
     // iOS motion permission
     if (typeof DeviceMotionEvent !== "undefined" &&
-        typeof DeviceMotionEvent.requestPermission === "function") {
+      typeof DeviceMotionEvent.requestPermission === "function") {
       const p = await DeviceMotionEvent.requestPermission();
       alert("DeviceMotion permission = " + p);
-      if(p !== "granted") return;
+      if (p !== "granted") return;
     }
 
-    window.addEventListener("devicemotion", onMotion, { passive:true });
+    window.addEventListener("devicemotion", onMotion, { passive: true });
 
     btn.disabled = true;
     btn.textContent = "已啟用";
     setStatus("charging");
 
-  }catch(err){
+  } catch (err) {
     alert("啟用失敗：" + err.message);
   }
 }
